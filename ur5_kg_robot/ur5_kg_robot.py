@@ -24,12 +24,14 @@ def main():
                 burt.home()
 
             elif ipt == 't':
-                demand_Joints = lm.grid_pos(burt,2,2,1,0)
-                burt.movej(demand_Joints)        # move above brick
                 burt.set_tcp(wp.lego_tcp_1brick)
                 burt.movel_tool([0,0,0,0,-15*pi/180.0,0])       # rotate grabber
                 burt.set_tcp(wp.lego_tcp)
                 burt.home()
+            elif ipt == 'r':
+                burt.record()
+            elif ipt == 'p':
+                burt.play(t=1.1)
 
             # high level lego
             elif ipt == 'hi':

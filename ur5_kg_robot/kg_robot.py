@@ -187,6 +187,7 @@ class kg_robot():
     # 2         pose move in linear space                           confirmation
     # 3         pose move relative to current position              confirmation
     # 4         force move in single axis                           confirmation
+    # 5         servo move, smooth transition for teach mode        confirmation
     #
     # 10        get current pose                                    pose
     # 11        get current jonts                                   joints
@@ -226,7 +227,7 @@ class kg_robot():
 
     def movel(self, pose, acc=0.5, vel=0.5, min_time=0, radius=0, wait=True):
         """
-        pose move in linear space
+        pose move process using servoj in linear space
         """
         prog = self.format_prog(2,pose=pose,acc=acc,vel=vel,t=min_time,r=radius,w=wait)
         return self.socket_send(prog)
@@ -471,7 +472,9 @@ class kg_robot():
     #
     #-------------------------------------------------------------------------------------------------------------------------------------------------------------------
  
+    def teach(self):
 
+        return
 
 
 

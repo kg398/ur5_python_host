@@ -27,6 +27,9 @@
     <Compile Include="specialised_kg_robot_example.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="teach_mode.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="ur5_kg_robot.py" />
     <Compile Include="waypoints.py">
       <SubType>Code</SubType>
