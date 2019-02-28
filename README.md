@@ -1,10 +1,10 @@
 # ur5_python_host
-Description:
+##Description:
 
 simple general purpose ur5 controller
 
 
- Connection Setup:
+ ##Connection Setup:
 
 -copy contents of kg_client to a memory stick and save program to ur5
 
@@ -20,11 +20,12 @@ simple general purpose ur5 controller
 --apply
 
 
-troubleshooting:
+##Troubleshooting:
+
 -have done everything above, and robot still not connecting - turn off wifi and/or disable other network connections
     
 
-Getting Started:
+##Getting Started:
 -main loop in \ur5_kg_robot\ur5_kg_robot.py, contains examples of using kg_robot
 
 -create specialised robot fns using formatting from \ur5_kg_robot\specialised_kg_robot_example.py
