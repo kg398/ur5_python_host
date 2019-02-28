@@ -13,3 +13,10 @@ set up connection:
                                     apply
 -troubleshooting:
     have done everything above, and robot still not connecting - turn off wifi and/or disable other network connections
+    
+    
+main loop in \ur5_kg_robot\ur5_kg_robot.py, contains examples of using kg_robot
+
+create specialised robot fns using formatting from \ur5_kg_robot\specialised_kg_robot_example.py
+
+use waypoint.py for global robot poses, joints and tool centre points (tcp)
