@@ -9,73 +9,70 @@ import _thread
 from math import pi
 
 thread_flag = False
+timer_flag = 0
 
 def wait_for_enter():
-    """"""
     global thread_flag
     thread_flag = True
     input()
-    print("enter")
     thread_flag = False
     return
 
-class teach():
-    """teach mode allows the user to record a sequence by physically moving the robot, playback is also featured"""
-    def __init__(self):
-        self.teach_name = "test.json"
+class teach_mode():
+    def __init__(self,robot):
+        self.name = "test.json"
+        self.robot = robot
 
     def record(self):
-        """record a series of moves when manually moving the robot, series recorded as a json with a user input name"""
         input("press enter to start and stop recording")
-        global thread_flag
+        global urnie_flag
         _thread.start_new_thread(wait_for_enter,())
         sequence = []
         n = 0
-        time.sleep(1)
-        #print("here0")
-        self.socket_send(self.format_prog(30))
-        #print("here")
+        sequence.append([self.robot.getl(),0])
+        time.sleep(2)
+        self.robot.socket_send(self.robot.format_prog(30))
         toc = time.time()
+        tic = toc
+        time.sleep(0.1)
         while(thread_flag == True and n < 3000):
-            sequence.append(self.getl())
+            timestep = time.time()-tic
+            sequence.append([self.robot.getl(),timestep])
+            tic = time.time()
             n+=1
-            time.sleep(0.05)
+            time.sleep(0.1)
 
-        self.socket_send(self.format_prog(31))
-        tic = time.time()
-        sequence.append(tic-toc)
-        print("recorded ",tic-toc,"secs")
-        self.teach_name = input('Sequence captured\r\nenter name: ')
-        self.teach_name+=".json"
-        open(self.teach_name, "w").write(json.dumps(sequence))
+        self.robot.socket_send(self.robot.format_prog(31))
+        sequence.append([self.robot.getl(),time.time()-toc])
+        print("recorded ",time.time()-toc,"secs")
 
-    def play(self,name = "",t=0.9):
-        """play a recording, e.g. name = "test.json", if no name specified, will play the last recording, 
-        t for filtering the velocity, high t for fast reponse, low t for smoother playback"""
+        self.name = input('Sequence captured\r\nenter name: ')
+        self.name+=".json"
+        open(self.name, "w").write(json.dumps(sequence))
+
+    def play(self, name=""):
         if name == "":
-            name = self.teach_name
+            name = self.name
         sequence = json.load(open(name))
-        print('Sequence length: ',len(sequence))
-        self.movel(sequence[0])
+        print(len(sequence))
+        print("average timestep: ",sequence[-1][1]/(len(sequence)-2))
+        self.robot.movel(sequence[0][0])
         toc = time.time()
-        av_vel = 0
         for i in range(1,len(sequence)-1):
-            #av_vel = 0.1*av_vel + t*math.sqrt(math.pow(sequence[i][0]-sequence[i-1][0],2)+math.pow(sequence[i][1]-sequence[i-1][1],2)+math.pow(sequence[i][2]-sequence[i-1][2],2))/0.08
-            dist = math.sqrt(math.pow(sequence[i][0]-sequence[i-1][0],2)+math.pow(sequence[i][1]-sequence[i-1][1],2)+math.pow(sequence[i][2]-sequence[i-1][2],2))
-            #print(dist)
-            if i == len(sequence)-2:
-                #print("end")
-                av_vel = 0*av_vel + t*math.sqrt(math.pow(sequence[i][0]-sequence[i-1][0],2)+math.pow(sequence[i][1]-sequence[i-1][1],2)+math.pow(sequence[i][2]-sequence[i-1][2],2))/0.1
-                self.movep(sequence[i],vel=av_vel,radius=0,wait=True)
-            else:
-                av_vel = 0*av_vel + t*math.sqrt(math.pow(sequence[i][0]-sequence[i-1][0],2)+math.pow(sequence[i][1]-sequence[i-1][1],2)+math.pow(sequence[i][2]-sequence[i-1][2],2))/0.1
-                #print("norm")
-                self.movep(sequence[i],vel=av_vel,radius=0.001)
-            #else:
-                #self.movep(sequence[i-1],vel=av_vel,radius=0.001)
-            #    print("too small")
-            time.sleep(0.045)
+            self.robot.servoj(sequence[i][0],control_time=sequence[i][1],lookahead_time=0.008,gain=300)
+
+        self.robot.stopl(0.5)
         tic = time.time()
-        print("Recorded ",sequence[len(sequence)-1],"secs")
-        print("Executed in ",tic-toc,"secs")
-        #print(sequence)
+        self.robot.socket_ping()
+        print("recorded ",sequence[-1][1],"secs")
+        print("executed in ",tic-toc,"secs")
+        print("recorded end_pos: ",sequence[-1][0])
+        print("actual end_pos:",self.robot.getl())
+
+    def seq_print(self,name = ""):
+        if name == "":
+            name = self.name
+        sequence = json.load(open(name))
+        for i in range(0,len(sequence)):
+            print(sequence[i])
+        print(len(sequence))
